@@ -1,3 +1,7 @@
+connect to db:
+gcloud sql connect mysql-cloud-instance --user=root
+
+
 CREATE TABLE puttResult (puttResultId INT NOT NULL AUTO_INCREMENT, userId INT, distance DECIMAL(5,2), isMade TINYINT(1), isUndone TINYINT(1), puttTimestamp TIMESTAMP, PRIMARY KEY(puttResultId));
 
 CREATE TABLE user (userId INT NOT NULL AUTO_INCREMENT, name VARCHAR(200), PRIMARY KEY(userId));
@@ -12,3 +16,6 @@ INSERT INTO user (name, createdDate) values ("Testuser", CURRENT_TIMESTAMP());
 
 
 INSERT INTO puttResult (userId, distance, isMade, isUndone, puttTimestamp) values (1, 8, 1, 1, CURRENT_TIMESTAMP());
+
+
+UPDATE puttResult SET isUndone=1 WHERE isUndone=0 ORDER BY puttResultId DESC LIMIT 1;

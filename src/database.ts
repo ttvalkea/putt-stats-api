@@ -45,31 +45,41 @@ export const queryAllPuttResults = async (
   console.log("Querying for all putt results.");
 
   if (connection) {
-    const query =
-      "select p.*, u.name from puttResult p left join user u on p.userId = u.userId;";
+    try {
+      const query =
+        "select p.*, u.name from puttResult p left join user u on p.userId = u.userId;";
 
-    const puttResults: dbPuttResult[] = await connection.query(query);
-    console.log(
-      "All putt results queried successfully. Rows returned: " +
-        puttResults.length
-    );
-    return puttResults.map(
-      (pr: dbPuttResult) =>
-        ({
-          distance: pr.distance,
-          isMade: !!pr.isMade,
-          isUndone: !!pr.isUndone,
-          name: pr.name,
-          puttResultId: pr.puttResultId,
-          puttTimestamp: pr.puttTimestamp,
-          userId: pr.userId,
-        } as apiPuttResult)
-    );
+      const puttResults: dbPuttResult[] = await connection.query(query);
+      console.log(
+        "All putt results queried successfully. Rows returned: " +
+          puttResults.length
+      );
+      return puttResults.map((dbPuttResult: dbPuttResult) =>
+        mapDbPuttResultToApiPuttResult(dbPuttResult)
+      );
+    } catch (error) {
+      console.log("Error querying the database for all putt results:");
+      console.log(error);
+      return [];
+    }
   } else {
     console.log("Cannot query database. No database connection.");
     return [];
   }
 };
+
+const mapDbPuttResultToApiPuttResult = (
+  dbPuttResult: dbPuttResult
+): apiPuttResult =>
+  ({
+    distance: dbPuttResult.distance,
+    isMade: !!dbPuttResult.isMade,
+    isUndone: !!dbPuttResult.isUndone,
+    name: dbPuttResult.name,
+    puttResultId: dbPuttResult.puttResultId,
+    puttTimestamp: dbPuttResult.puttTimestamp,
+    userId: dbPuttResult.userId,
+  } as apiPuttResult);
 
 export const insertNewPuttResult = async (
   connection: Connection,
@@ -90,6 +100,42 @@ export const insertNewPuttResult = async (
     }
   } else {
     console.log("Cannot insert to database. No database connection.");
+    return false;
+  }
+};
+
+// Marks the last putt with isUndone = 0 to have isUndone = 1
+export const undoLastPutt = async (
+  connection: Connection
+): Promise<apiPuttResult | boolean> => {
+  console.log("Undoing last putt.");
+
+  if (connection) {
+    try {
+      // Select the row first for returning
+      const selectQuery =
+        "select p.*, u.name from puttResult p left join user u on p.userId = u.userId WHERE p.isUndone=0 ORDER BY puttResultId DESC LIMIT 1;";
+      const rowToUndo: dbPuttResult[] = await connection.query(selectQuery);
+
+      // Undoing operation
+      const undoQuery =
+        "UPDATE puttResult SET isUndone=1 WHERE isUndone=0 ORDER BY puttResultId DESC LIMIT 1;";
+      const undoResult: any = await connection.query(undoQuery);
+      if (undoResult?.changedRows === 1) {
+        // Return the undone row's data if undo is successful
+        return rowToUndo.map((dbPuttResult: dbPuttResult) =>
+          mapDbPuttResultToApiPuttResult(dbPuttResult)
+        )[0];
+      } else if (undoResult?.changedRows === 0) {
+        return true; // No errors, but also no rows to undo.
+      }
+    } catch (error) {
+      console.log("Error undoing the last putt result:");
+      console.log(error);
+      return false;
+    }
+  } else {
+    console.log("Cannot undo last putt result. No database connection.");
     return false;
   }
 };

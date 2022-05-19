@@ -2,6 +2,7 @@ import {
   createConnection,
   insertNewPuttResult,
   queryAllPuttResults,
+  undoLastPutt,
 } from "./database";
 import cors from "cors";
 import express from "express";
@@ -43,6 +44,15 @@ app.post("/mark-putt", async (request, response) => {
   } else {
     response.end("Error marking a putt: No putt data in the request body");
   }
+});
+
+// Undo the last putt result that is not undone. Returns the undone putt or true, if no there is no putt to to undo.
+app.put("/undo-putt", async (request, response) => {
+  if (!connection) {
+    connection = await createConnection();
+  }
+  const undoResult = await undoLastPutt(connection);
+  response.end(JSON.stringify(undoResult));
 });
 
 app.listen(port, () => {

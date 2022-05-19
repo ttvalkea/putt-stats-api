@@ -1,5 +1,6 @@
 import mysql, { Connection } from "promise-mysql";
 import dotenv from "dotenv";
+import { apiPuttResult, dbPuttResult } from "./types";
 dotenv.config();
 
 let retriedToConnectAmount = 0;
@@ -38,19 +39,32 @@ export const createConnection = async (): Promise<Connection> => {
   }
 };
 
-export const queryAllPuttResults = async (connection: Connection) => {
+export const queryAllPuttResults = async (
+  connection: Connection
+): Promise<apiPuttResult[]> => {
   console.log("Querying for all putt results.");
 
   if (connection) {
     const query =
       "select p.*, u.name from puttResult p left join user u on p.userId = u.userId;";
 
-    const puttResults: Array<any> = await connection.query(query);
+    const puttResults: dbPuttResult[] = await connection.query(query);
     console.log(
       "All putt results queried successfully. Rows returned: " +
         puttResults.length
     );
-    return puttResults;
+    return puttResults.map(
+      (pr: dbPuttResult) =>
+        ({
+          distance: pr.distance,
+          isMade: !!pr.isMade,
+          isUndone: !!pr.isUndone,
+          name: pr.name,
+          puttResultId: pr.puttResultId,
+          puttTimestamp: pr.puttTimestamp,
+          userId: pr.userId,
+        } as apiPuttResult)
+    );
   } else {
     console.log("Cannot query database. No database connection.");
     return [];

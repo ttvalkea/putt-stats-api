@@ -1,0 +1,5 @@
+NODE_ENV = development
+DB_HOST = 34.88.153.108
+DB_USER = root
+DB_PASSWORD = ADD_PASS_WORD_HERE
+DB_DATABASE = putt_stats

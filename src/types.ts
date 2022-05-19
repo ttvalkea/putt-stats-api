@@ -4,7 +4,7 @@ export type dbPuttResult = {
   isUndone: number; // TINYINT(1)
   name: string;
   puttResultId: number;
-  puttTimestamp: Date;
+  puttTimestamp: string; // Date, but returned as a string from the database
   userId: number;
 };
 
@@ -14,7 +14,7 @@ export type apiPuttResult = {
   isUndone: boolean; // Converted to boolean
   name: string;
   puttResultId: number;
-  puttTimestamp: Date;
+  puttTimestamp: string;
   userId: number;
 };
 

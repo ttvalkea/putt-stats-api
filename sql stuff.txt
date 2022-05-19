@@ -19,3 +19,19 @@ INSERT INTO puttResult (userId, distance, isMade, isUndone, puttTimestamp) value
 
 
 UPDATE puttResult SET isUndone=1 WHERE isUndone=0 ORDER BY puttResultId DESC LIMIT 1;
+
+
+
+SELECT 
+    o.orderNumber, 
+    customerNumber, 
+    productCode
+FROM
+    orders o
+LEFT JOIN orderDetails 
+    USING (orderNumber)
+WHERE
+    orderNumber = 10123;
+	
+
+select p.*, u.name from puttResult p left join user u on p.userId = u.userId WHERE p.isUndone=1 ORDER BY puttResultId DESC LIMIT 1;

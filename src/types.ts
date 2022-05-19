@@ -17,3 +17,9 @@ export type apiPuttResult = {
   puttTimestamp: Date;
   userId: number;
 };
+
+export type newPuttInsert = {
+  distance: number;
+  isMade: boolean;
+  userId: number;
+};

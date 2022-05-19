@@ -1,6 +1,6 @@
 import mysql, { Connection } from "promise-mysql";
 import dotenv from "dotenv";
-import { apiPuttResult, dbPuttResult } from "./types";
+import { apiPuttResult, dbPuttResult, newPuttInsert } from "./types";
 dotenv.config();
 
 let retriedToConnectAmount = 0;
@@ -68,5 +68,28 @@ export const queryAllPuttResults = async (
   } else {
     console.log("Cannot query database. No database connection.");
     return [];
+  }
+};
+
+export const insertNewPuttResult = async (
+  connection: Connection,
+  puttData: newPuttInsert
+): Promise<boolean> => {
+  console.log("Inserting a new putt result");
+
+  if (connection) {
+    try {
+      const query = `INSERT INTO puttResult (userId, distance, isMade, isUndone, puttTimestamp) values (${puttData.userId}, ${puttData.distance}, ${puttData.isMade}, 0, CURRENT_TIMESTAMP());`;
+      await connection.query(query);
+      console.log("Putt result inserted: " + JSON.stringify(puttData));
+      return true;
+    } catch (error) {
+      console.log("Error inserting a putt result:");
+      console.log(error);
+      return false;
+    }
+  } else {
+    console.log("Cannot insert to database. No database connection.");
+    return false;
   }
 };

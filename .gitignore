@@ -130,3 +130,6 @@ dist
 .pnp.*
 
 things_to_remember.txt
+
+*.js
+*.js.map

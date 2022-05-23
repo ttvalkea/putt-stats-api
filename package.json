@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "serve": "npx tsc && node dist/app.js"
+    "serve": "npx tsc && node dist/app.js",
+    "deploy": "npx tsc && xcopy /s /Y dist . && del server.js && rename app.js server.js && gcloud app deploy"
   },
   "dependencies": {
     "cors": "^2.8.5",

@@ -12,3 +12,4 @@ If a database connection can't be formed, check that the server's network is in 
 
 First you need to have GCP SDK installed.
 Run `npm run deploy`. That will copy the files from /dist to the root folder and rename app.js to server.js and then run gcloud app deploy.
+The command `deploy` should work on Windows and probably won't work on other operating systems.

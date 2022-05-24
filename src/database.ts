@@ -2,20 +2,28 @@ import mysql, { Connection } from "promise-mysql";
 import dotenv from "dotenv";
 import { apiPuttResult, dbPuttResult, newPuttInsert } from "./types";
 dotenv.config();
-
+import http from "http";
 let retriedToConnectAmount = 0;
 export const createConnection = async (): Promise<Connection> => {
-  const maximumRetryConnectionCreationAttempts = 10;
+  const maximumRetryConnectionCreationAttempts = 3;
 
   console.log("Creating database connection.");
-
   try {
-    const connection = await mysql.createConnection({
+    const connectionParameters = {
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
+    };
+
+    http.get({ host: "api.ipify.org", port: 80, path: "/" }, function (resp) {
+      resp.on("data", function (ip) {
+        // This is here because the network where the API is running needs to be authorized from Cloud SQL
+        console.log("My public IP address is: " + ip);
+      });
     });
+    const connection = await mysql.createConnection(connectionParameters);
+
     console.log("Database connection created successfully.");
     retriedToConnectAmount = 0; // This is useless/doesn't do anything?
     return connection;

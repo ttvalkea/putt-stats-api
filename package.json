@@ -4,7 +4,6 @@
     "deploy": "npx tsc && xcopy /s /Y dist . && del server.js && rename app.js server.js && gcloud config set project poetic-now-349710 && gcloud app deploy"
   },
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "promise-mysql": "^5.2.0"

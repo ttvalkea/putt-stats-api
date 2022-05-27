@@ -1,5 +1,5 @@
-NODE_ENV = development
 DB_HOST = 34.88.153.108
 DB_USER = root
 DB_PASSWORD = ADD_PASS_WORD_HERE
 DB_DATABASE = putt_stats
+CORS_ALLOWED_ORIGIN = http://localhost:3000 for local development or https://fill-frontend-url-goes-here.com

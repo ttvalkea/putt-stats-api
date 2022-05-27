@@ -4,32 +4,32 @@ import {
   queryAllPuttResults,
   undoLastPutt,
 } from "./database";
-import cors from "cors";
 import express from "express";
 import { Connection } from "promise-mysql";
 import { newPuttInsert } from "./types";
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
 app.use(express.json()); // For reading request bodies as json
 
 // --- CORS ---
-var allowedOrigins = [
-  "http://localhost:3000",
-  "https://putt-stats-react.ey.r.appspot.com",
-];
-app.use(
-  cors({
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
-    origin: function (origin, callback) {
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const errorMessage =
-          "The CORS policy for this site does not " +
-          "allow access from the specified Origin.";
-        return callback(new Error(errorMessage), false);
-      }
-      return callback(null, true);
-    },
-  })
-);
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", process.env.CORS_ALLOWED_ORIGIN);
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,PUT,POST,DELETE,PATCH,OPTIONS"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, Content-Length, X-Requested-With"
+  );
+  // allow preflight
+  if (req.method === "OPTIONS") {
+    res.send(200);
+  } else {
+    next();
+  }
+});
 
 const port = 8081;
 const hostname = "127.0.0.1";
@@ -85,7 +85,13 @@ app.put("/undo-putt", async (request, response) => {
 });
 
 app.listen(port, () => {
-  console.log("Putt stats API app listening at http://%s:%s", hostname, port);
+  console.log(
+    "Putt stats API app listening at http://%s:%s . Allowing API calls from %s (%s)",
+    hostname,
+    port,
+    process.env.CORS_ALLOWED_ORIGIN,
+    process.env.NODE_ENV
+  );
 });
 
 // Need certain headers for all requests. This is done as a very low level security measure to prevent unwanted SQL calls to GCP.

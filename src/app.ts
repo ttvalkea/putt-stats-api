@@ -14,18 +14,18 @@ app.use(express.json()); // For reading request bodies as json
 
 // --- CORS ---
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", process.env.CORS_ALLOWED_ORIGIN);
-  res.header(
+  res.setHeader("Access-Control-Allow-Origin", process.env.CORS_ALLOWED_ORIGIN);
+  res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET,PUT,POST,DELETE,PATCH,OPTIONS"
+    "GET, PUT, POST, DELETE, PATCH, OPTIONS"
   );
-  res.header(
+  res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, Content-Length, X-Requested-With, throwdata"
   );
   // allow preflight
   if (req.method === "OPTIONS") {
-    res.send(200);
+    res.sendStatus(200);
   } else {
     next();
   }
@@ -66,13 +66,13 @@ app.post("/mark-putt", async (request, response) => {
     } else {
       response.end("Error marking a putt: No putt data in the request body");
     }
-    response.status(401);
-    response.end();
   }
+  response.status(401);
+  response.end();
 });
 
 // Undo the last putt result that is not undone. Returns the undone putt or true, if no there is no putt to to undo.
-app.put("/undo-putt", async (request, response) => {
+app.patch("/undo-putt", async (request, response) => {
   if (checkHeaders(request)) {
     if (!connection) {
       connection = await createConnection();

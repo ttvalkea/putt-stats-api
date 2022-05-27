@@ -1,7 +1,7 @@
 {
   "scripts": {
     "serve": "npx tsc && node dist/app.js",
-    "deploy": "npx tsc && xcopy /s /Y dist . && del server.js && rename app.js server.js && gcloud app deploy"
+    "deploy": "npx tsc && xcopy /s /Y dist . && del server.js && rename app.js server.js && gcloud config set project poetic-now-349710 && gcloud app deploy"
   },
   "dependencies": {
     "cors": "^2.8.5",

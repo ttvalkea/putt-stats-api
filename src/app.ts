@@ -12,7 +12,24 @@ const app = express();
 app.use(express.json()); // For reading request bodies as json
 
 // --- CORS ---
-app.use(cors());
+var allowedOrigins = [
+  "http://localhost:3000",
+  "https://putt-stats-react.ey.r.appspot.com",
+];
+app.use(
+  cors({
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    origin: function (origin, callback) {
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const errorMessage =
+          "The CORS policy for this site does not " +
+          "allow access from the specified Origin.";
+        return callback(new Error(errorMessage), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 const port = 8081;
 const hostname = "127.0.0.1";

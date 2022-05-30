@@ -106,7 +106,7 @@ export const insertNewPuttResult = async (
 
   if (connection) {
     try {
-      const query = `INSERT INTO puttResult (userId, distance, isMade, isUndone, puttTimestamp) values (${puttData.userId}, ${puttData.distance}, ${puttData.isMade}, 0, CURRENT_TIMESTAMP());`;
+      const query = `INSERT INTO puttResult (userId, distance, isMade, isUndone, type, puttTimestamp) values (${puttData.userId}, ${puttData.distance}, ${puttData.isMade}, 0, ${puttData.type}, CURRENT_TIMESTAMP());`;
       await connection.query(query);
       console.log("Putt result inserted: " + JSON.stringify(puttData));
       return true;

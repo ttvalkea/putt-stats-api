@@ -43,7 +43,10 @@ app.get("/putt-results", async (request, response) => {
     if (!connection) {
       connection = await createConnection();
     }
-    const allPuttResults = await queryAllPuttResults(connection);
+    const userId: number | undefined = request.query.userId
+      ? parseInt(request.query.userId.toString())
+      : undefined;
+    const allPuttResults = await queryAllPuttResults(connection, userId);
     response.end(JSON.stringify(allPuttResults));
   }
   response.status(401);

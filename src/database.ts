@@ -48,15 +48,19 @@ export const createConnection = async (): Promise<Connection> => {
 };
 
 export const queryAllPuttResults = async (
-  connection: Connection
+  connection: Connection,
+  userId: number | undefined
 ): Promise<apiPuttResult[]> => {
   console.log("Querying for all putt results.");
 
   if (connection) {
     try {
-      const query =
-        "select p.*, u.name from puttResult p left join user u on p.userId = u.userId;";
-
+      let query =
+        "select p.*, u.name from puttResult p left join user u on p.userId = u.userId";
+      if (userId) {
+        query += ` where p.userId=${userId}`;
+      }
+      query += ";";
       const puttResults: dbPuttResult[] = await connection.query(query);
       console.log(
         "All putt results queried successfully. Rows returned: " +

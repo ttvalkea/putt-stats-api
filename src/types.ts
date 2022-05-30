@@ -6,6 +6,7 @@ export type dbPuttResult = {
   puttResultId: number;
   puttTimestamp: string; // Date, but returned as a string from the database
   userId: number;
+  type: string;
 };
 
 export type apiPuttResult = {
@@ -16,6 +17,7 @@ export type apiPuttResult = {
   puttResultId: number;
   puttTimestamp: string;
   userId: number;
+  type: PuttType;
 };
 
 export type newPuttInsert = {
@@ -23,3 +25,10 @@ export type newPuttInsert = {
   isMade: boolean;
   userId: number;
 };
+
+export enum PuttType {
+  Test = 1,
+  Practice = 2,
+  Competition = 3,
+  Unknown = 4,
+}

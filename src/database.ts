@@ -1,6 +1,6 @@
 import mysql, { Connection } from "promise-mysql";
 import dotenv from "dotenv";
-import { apiPuttResult, dbPuttResult, newPuttInsert } from "./types";
+import { apiPuttResult, dbPuttResult, newPuttInsert, PuttType } from "./types";
 dotenv.config();
 import http from "http";
 let retriedToConnectAmount = 0;
@@ -87,7 +87,16 @@ const mapDbPuttResultToApiPuttResult = (
     puttResultId: dbPuttResult.puttResultId,
     puttTimestamp: dbPuttResult.puttTimestamp,
     userId: dbPuttResult.userId,
+    type: mapPuttTypeFromStringToEnum(dbPuttResult.type),
   } as apiPuttResult);
+
+// Converts a putt type from a string to an enum
+const mapPuttTypeFromStringToEnum = (typeString: string): PuttType => {
+  const puttTypeEnum: PuttType = PuttType[typeString as keyof typeof PuttType];
+
+  // If the string can't be cast to the enum, puttTypeEnum will be undefined and then Unknown type is returned.
+  return puttTypeEnum ?? PuttType.Unknown;
+};
 
 export const insertNewPuttResult = async (
   connection: Connection,

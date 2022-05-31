@@ -20,6 +20,11 @@ export type apiPuttResult = {
   type: PuttType;
 };
 
+export type user = {
+  userId: number;
+  name: string;
+};
+
 export type newPuttInsert = {
   distance: number;
   isMade: boolean;

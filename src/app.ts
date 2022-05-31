@@ -2,6 +2,7 @@ import {
   createConnection,
   insertNewPuttResult,
   queryAllPuttResults,
+  queryAllUsers,
   undoLastPutt,
 } from "./database";
 import express, { NextFunction, Request, Response } from "express";
@@ -96,6 +97,19 @@ app.patch(
     response.end();
   }
 );
+
+// Returns all users
+app.get("/users", async (request: Request, response: Response) => {
+  if (checkHeaders(request)) {
+    if (!connection) {
+      connection = await createConnection();
+    }
+    const allUsers = await queryAllUsers(connection);
+    response.end(JSON.stringify(allUsers));
+  }
+  response.status(401);
+  response.end();
+});
 
 app.listen(port, () => {
   console.log(

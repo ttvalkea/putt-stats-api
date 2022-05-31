@@ -1,6 +1,6 @@
 import mysql, { Connection } from "promise-mysql";
 import dotenv from "dotenv";
-import { apiPuttResult, dbPuttResult, newPuttInsert } from "./types";
+import { apiPuttResult, dbPuttResult, newPuttInsert, user } from "./types";
 dotenv.config();
 import http from "http";
 import { mapDbPuttResultToApiPuttResult } from "./utilities";
@@ -54,7 +54,7 @@ export const queryAllPuttResults = async (
   connection: Connection,
   userId: number | undefined
 ): Promise<apiPuttResult[]> => {
-  console.log("Querying for all putt results.");
+  console.log(`Querying for all putt results for userId ${userId}.`);
 
   if (connection) {
     try {
@@ -78,7 +78,9 @@ export const queryAllPuttResults = async (
       return [];
     }
   } else {
-    console.log("Cannot query database. No database connection.");
+    console.log(
+      "Cannot query database for putt results. No database connection."
+    );
     return [];
   }
 };
@@ -91,7 +93,12 @@ export const insertNewPuttResult = async (
 
   if (connection) {
     try {
-      const query = `INSERT INTO puttResult (userId, distance, isMade, isUndone, type, puttTimestamp) values (${puttData.userId}, ${puttData.distance}, ${puttData.isMade}, 0, ${puttData.type}, CURRENT_TIMESTAMP());`;
+      // Using parseInt for all values to protect against malicious input data in the form of SQL injection
+      const query = `INSERT INTO puttResult (userId, distance, isMade, isUndone, type, puttTimestamp) values (${parseInt(
+        puttData.userId as any
+      )}, ${parseInt(puttData.distance as any)}, ${parseInt(
+        puttData.isMade as any
+      )}, 0, ${parseInt(puttData.type as any)}, CURRENT_TIMESTAMP());`;
       await connection.query(query);
       console.log("Putt result inserted: " + JSON.stringify(puttData));
       return true;
@@ -101,7 +108,9 @@ export const insertNewPuttResult = async (
       return false;
     }
   } else {
-    console.log("Cannot insert to database. No database connection.");
+    console.log(
+      "Cannot insert putt result to database. No database connection."
+    );
     return false;
   }
 };
@@ -138,5 +147,30 @@ export const undoLastPutt = async (
   } else {
     console.log("Cannot undo last putt result. No database connection.");
     return false;
+  }
+};
+
+export const queryAllUsers = async (
+  connection: Connection
+): Promise<user[]> => {
+  console.log("Querying for all users.");
+
+  if (connection) {
+    try {
+      const query = "select userId, name from user;";
+      const userQueryResults: user[] = await connection.query(query);
+      console.log(
+        "All users queried successfully. Rows returned: " +
+          userQueryResults.length
+      );
+      return userQueryResults;
+    } catch (error) {
+      console.log("Error querying the database for all users:");
+      console.log(error);
+      return [];
+    }
+  } else {
+    console.log("Cannot query database for users. No database connection.");
+    return [];
   }
 };

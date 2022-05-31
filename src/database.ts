@@ -1,9 +1,12 @@
 import mysql, { Connection } from "promise-mysql";
 import dotenv from "dotenv";
-import { apiPuttResult, dbPuttResult, newPuttInsert, PuttType } from "./types";
+import { apiPuttResult, dbPuttResult, newPuttInsert } from "./types";
 dotenv.config();
 import http from "http";
+import { mapDbPuttResultToApiPuttResult } from "./utilities";
+
 let retriedToConnectAmount = 0;
+
 export const createConnection = async (): Promise<Connection> => {
   const maximumRetryConnectionCreationAttempts = 3;
 
@@ -80,28 +83,6 @@ export const queryAllPuttResults = async (
   }
 };
 
-const mapDbPuttResultToApiPuttResult = (
-  dbPuttResult: dbPuttResult
-): apiPuttResult =>
-  ({
-    distance: dbPuttResult.distance,
-    isMade: !!dbPuttResult.isMade,
-    isUndone: !!dbPuttResult.isUndone,
-    name: dbPuttResult.name,
-    puttResultId: dbPuttResult.puttResultId,
-    puttTimestamp: dbPuttResult.puttTimestamp,
-    userId: dbPuttResult.userId,
-    type: mapPuttTypeFromStringToEnum(dbPuttResult.type),
-  } as apiPuttResult);
-
-// Converts a putt type from a string to an enum
-const mapPuttTypeFromStringToEnum = (typeString: string): PuttType => {
-  const puttTypeEnum: PuttType = PuttType[typeString as keyof typeof PuttType];
-
-  // If the string can't be cast to the enum, puttTypeEnum will be undefined and then Unknown type is returned.
-  return puttTypeEnum ?? PuttType.Unknown;
-};
-
 export const insertNewPuttResult = async (
   connection: Connection,
   puttData: newPuttInsert
@@ -127,20 +108,19 @@ export const insertNewPuttResult = async (
 
 // Marks the last putt with isUndone = 0 to have isUndone = 1
 export const undoLastPutt = async (
-  connection: Connection
+  connection: Connection,
+  userId: number
 ): Promise<apiPuttResult | boolean> => {
-  console.log("Undoing last putt.");
+  console.log(`Undoing last putt for userId ${userId}.`);
 
   if (connection) {
     try {
       // Select the row first for returning
-      const selectQuery =
-        "select p.*, u.name from puttResult p left join user u on p.userId = u.userId WHERE p.isUndone=0 ORDER BY puttResultId DESC LIMIT 1;";
+      const selectQuery = `select p.*, u.name from puttResult p left join user u on p.userId = u.userId WHERE p.isUndone=0 AND p.userId=${userId} ORDER BY puttResultId DESC LIMIT 1;`;
       const rowToUndo: dbPuttResult[] = await connection.query(selectQuery);
 
       // Undoing operation
-      const undoQuery =
-        "UPDATE puttResult SET isUndone=1 WHERE isUndone=0 ORDER BY puttResultId DESC LIMIT 1;";
+      const undoQuery = `UPDATE puttResult SET isUndone=1 WHERE isUndone=0 AND userId=${userId} ORDER BY puttResultId DESC LIMIT 1;`;
       const undoResult: any = await connection.query(undoQuery);
       if (undoResult?.changedRows === 1) {
         // Return the undone row's data if undo is successful

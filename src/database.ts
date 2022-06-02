@@ -96,9 +96,9 @@ export const insertNewPuttResult = async (
       // Using parseInt for all values to protect against malicious input data in the form of SQL injection
       const query = `INSERT INTO puttResult (userId, distance, isMade, isUndone, type, puttTimestamp) values (${parseInt(
         puttData.userId as any
-      )}, ${parseInt(puttData.distance as any)}, ${parseInt(
-        puttData.isMade as any
-      )}, 0, ${parseInt(puttData.type as any)}, CURRENT_TIMESTAMP());`;
+      )}, ${parseInt(puttData.distance as any)}, ${
+        puttData.isMade ? 1 : 0
+      }, 0, ${parseInt(puttData.type as any)}, CURRENT_TIMESTAMP());`;
       await connection.query(query);
       console.log("Putt result inserted: " + JSON.stringify(puttData));
       return true;

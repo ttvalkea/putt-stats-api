@@ -1,5 +1,7 @@
 # API for disc golf putt data stored in GCP Cloud SQL MySQL database
 
+Create a .env file to the root using "example of .env file" as an example. Make sure it has correct values. At least the database password needs to be set.
+
 ### Running the app using Docker
 
 Run `docker-compose up --build`
@@ -9,8 +11,6 @@ The API will be exposed in http://localhost:8081
 ### Running the app without using Docker
 
 First install dependencies with `npm i`
-
-Create a .env file to the root using "example of .env file" as an example. Make sure it has correct values. At least the database password needs to be set.
 
 Build and run the API with `npm run serve`
 
